@@ -1852,9 +1852,15 @@ std::string TextBuffer::GenRTF(const TextAndColor& rows, const int fontHeightPoi
 // Arguments:
 // - oldBuffer - the text buffer to copy the contents FROM
 // - newBuffer - the text buffer to copy the contents TO
+// - lastCharacterViewport - Optional. If the caller knows that the last
+//   nonspace character is in a particular Viewport, the caller can provide this
+//   parameter as an optimization, as opposed to searching the entire buffer.
 // Return Value:
 // - S_OK if we successfully copied the contents to the new buffer, otherwise an appropriate HRESULT.
-HRESULT TextBuffer::Reflow(TextBuffer& oldBuffer, TextBuffer& newBuffer)
+HRESULT TextBuffer::Reflow(TextBuffer& oldBuffer,
+                           TextBuffer& newBuffer,
+                           const std::optional<Viewport> lastCharacterViewport,
+                           short* const lastScrollbackRow) noexcept
 {
     Cursor& oldCursor = oldBuffer.GetCursor();
     Cursor& newCursor = newBuffer.GetCursor();
@@ -1866,18 +1872,30 @@ HRESULT TextBuffer::Reflow(TextBuffer& oldBuffer, TextBuffer& newBuffer)
     // place the new cursor back on the equivalent character in
     // the new buffer.
     const COORD cOldCursorPos = oldCursor.GetPosition();
-    const COORD cOldLastChar = oldBuffer.GetLastNonSpaceCharacter();
+    const COORD cOldLastChar = lastCharacterViewport.has_value() ?
+                                   oldBuffer.GetLastNonSpaceCharacter(lastCharacterViewport.value()) :
+                                   oldBuffer.GetLastNonSpaceCharacter();
 
-    short const cOldRowsTotal = cOldLastChar.Y + 1;
-    short const cOldColsTotal = oldBuffer.GetSize().Width();
+    const short cOldRowsTotal = cOldLastChar.Y + 1;
+    const short cOldColsTotal = oldBuffer.GetSize().Width();
 
     COORD cNewCursorPos = { 0 };
     bool fFoundCursorPos = false;
-
+    bool foundScrollbackEnd = false;
     HRESULT hr = S_OK;
     // Loop through all the rows of the old buffer and reprint them into the new buffer
     for (short iOldRow = 0; iOldRow < cOldRowsTotal; iOldRow++)
     {
+        if (lastScrollbackRow && !foundScrollbackEnd)
+        {
+            if (iOldRow >= *lastScrollbackRow)
+            {
+                // *lastScrollbackRow = gsl::narrow_cast<short>(newCursor.GetPosition().Y - 1);
+                *lastScrollbackRow = gsl::narrow_cast<short>(newCursor.GetPosition().Y);
+                foundScrollbackEnd = true;
+            }
+        }
+
         // Fetch the row and its "right" which is the last printable character.
         const ROW& row = oldBuffer.GetRowByOffset(iOldRow);
         const CharRow& charRow = row.GetCharRow();
