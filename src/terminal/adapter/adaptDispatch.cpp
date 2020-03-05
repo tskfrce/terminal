@@ -1039,7 +1039,12 @@ bool AdaptDispatch::ResetPrivateModes(const std::basic_string_view<DispatchTypes
 // - True if handled successfully. False otherwise.
 bool AdaptDispatch::SetKeypadMode(const bool fApplicationMode)
 {
-    return _pConApi->PrivateSetKeypadMode(fApplicationMode);
+    // TODO GH#XXXX:
+    //   This is a temporary replacement to enable passhthrough
+    //   mode for Windows Terminal. Replace with proper _pConApi
+    //   call below when ConPty has been properly updated.
+    //return _pConApi->PrivateSetKeypadMode(fApplicationMode);
+    return false;
 }
 
 // - DECCKM - Sets the cursor keys input mode to either Application mode or Normal mode (true, false respectively)
@@ -1049,7 +1054,12 @@ bool AdaptDispatch::SetKeypadMode(const bool fApplicationMode)
 // - True if handled successfully. False otherwise.
 bool AdaptDispatch::SetCursorKeysMode(const bool applicationMode)
 {
-    return _pConApi->PrivateSetCursorKeysMode(applicationMode);
+    // TODO GH#XXXX:
+    //   This is a temporary replacement to enable passhthrough
+    //   mode for Windows Terminal. Replace with proper _pConApi
+    //   call below when ConPty has been properly updated.
+    //return _pConApi->PrivateSetCursorKeysMode(applicationMode);
+    return false;
 }
 
 // - att610 - Enables or disables the cursor blinking.
@@ -1712,7 +1722,12 @@ bool AdaptDispatch::EnableUTF8ExtendedMouseMode(const bool enabled)
 // True if handled successfully. False otherwise.
 bool AdaptDispatch::EnableSGRExtendedMouseMode(const bool enabled)
 {
-    return _pConApi->PrivateEnableSGRExtendedMouseMode(enabled);
+    // TODO GH#XXXX:
+    //   This is a temporary replacement to enable passhthrough
+    //   mode for Windows Terminal. Replace with proper _pConApi
+    //   call below when ConPty has been properly updated.
+    // return _pConApi->PrivateEnableSGRExtendedMouseMode(enabled);
+    return false;
 }
 
 //Routine Description:

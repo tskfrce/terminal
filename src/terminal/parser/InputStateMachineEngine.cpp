@@ -326,6 +326,13 @@ bool InputStateMachineEngine::ActionCsiDispatch(const wchar_t wch,
         {
         case CsiIntermediateCodes::MOUSE_SGR:
         {
+            // TODO GH#XXXX:
+            //   This is a temporary replacement to enable passhthrough
+            //   mode for Windows Terminal. Replace with proper logic
+            //   below when ConPty has been properly updated.
+            success = false;
+
+            /*
             DWORD buttonState = 0;
             DWORD eventFlags = 0;
             modifierState = _GetSGRMouseModifierState(parameters);
@@ -335,6 +342,7 @@ bool InputStateMachineEngine::ActionCsiDispatch(const wchar_t wch,
             // even if we failed to parse a portion of this sequence.
             success = _UpdateSGRMouseButtonState(wch, parameters, buttonState, eventFlags) && success;
             success = success && _WriteMouseEvent(col, row, buttonState, modifierState, eventFlags);
+            */
         }
         default:
             success = false;

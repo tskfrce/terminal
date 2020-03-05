@@ -180,7 +180,6 @@ namespace Microsoft::Console::VirtualTerminal
 
         bool _IsModified(const size_t paramCount) noexcept;
         DWORD _GetModifier(const size_t parameter) noexcept;
-        DWORD _GetSGRModifier(const size_t parameter) noexcept;
 
         bool _UpdateSGRMouseButtonState(const wchar_t wch,
                                         const std::basic_string_view<size_t> parameters,
